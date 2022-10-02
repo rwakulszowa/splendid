@@ -1,0 +1,23 @@
+{
+  "name": "splendid",
+  "version": "0.1.0",
+  "description": "Data visualizations, but kinda smart.",
+  "source": "src/index.html",
+  "scripts": {
+    "start": "parcel",
+    "build": "parcel build"
+  },
+  "repository": "git@github.com:rwakulszowa/splendid.git",
+  "author": "rwa <rwakulszowa1@gmail.com>",
+  "license": "MIT",
+  "devDependencies": {
+    "@types/react": "^18.0.21",
+    "@types/react-dom": "^18.0.6",
+    "parcel": "^2.7.0",
+    "process": "^0.11.10"
+  },
+  "dependencies": {
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0"
+  }
+}
