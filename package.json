@@ -5,7 +5,7 @@
   "source": "src/index.html",
   "scripts": {
     "start": "parcel",
-    "build": "parcel build"
+    "build": "parcel build --public-url ."
   },
   "repository": "git@github.com:rwakulszowa/splendid.git",
   "author": "rwa <rwakulszowa1@gmail.com>",
