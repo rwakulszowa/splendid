@@ -16,16 +16,15 @@ export function Editor({
   }, []);
 
   return (
-    <label>
-      Query
-      <textarea
-        value={content}
-        onChange={(event) => {
-          const content = event.target.value;
-          setContent(content);
-          onContentUpdate(content);
-        }}
-      />
-    </label>
+    <textarea
+      id="editor-input"
+      className="w-full h-full"
+      value={content}
+      onChange={(event) => {
+        const content = event.target.value;
+        setContent(content);
+        onContentUpdate(content);
+      }}
+    />
   );
 }

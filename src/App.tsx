@@ -51,14 +51,34 @@ export function App() {
     };
 
     return (
-      <div>
-        <Editor
-          initialContent={"SELECT * FROM pets"}
-          onContentUpdate={onQueryChange}
-        />
-        <pre>
-          <MaybeTable maybeTable={qResult} />
-        </pre>
+      <div className="flex flex-row gap-4 p-4 h-screen">
+        <div
+          id="editor-container"
+          className="basis-1/2 w-full h-3/4 flex flex-col"
+        >
+          <label htmlFor="editor" className="font-light">
+            Query Editor
+          </label>
+          <div id="query-editor" className="grow border-4 rounded">
+            <Editor
+              initialContent={"SELECT * FROM pets"}
+              onContentUpdate={onQueryChange}
+            />
+          </div>
+        </div>
+        <div
+          id="result-container"
+          className="basis-1/2 w-full h-full flex flex-col"
+        >
+          <label htmlFor="result" className="font-light">
+            Result
+          </label>
+          <div id="query-result" className="grow">
+            <pre>
+              <MaybeTable maybeTable={qResult} />
+            </pre>
+          </div>
+        </div>
       </div>
     );
   }
