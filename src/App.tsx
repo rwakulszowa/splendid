@@ -4,6 +4,7 @@ import initSqlJs from "sql.js";
 import wasmURL from "url:sql.js/dist/sql-wasm.wasm";
 
 import { Editor } from "./Editor";
+import { Table } from "./Table";
 
 type DbResult = string | SQL.Database;
 type Table = { columns: [string]; values: [string] };
@@ -50,7 +51,6 @@ export function App() {
       }
     };
 
-    // const result = db.exec("SELECT * FROM pets");
     return (
       <div>
         <Editor
@@ -58,42 +58,17 @@ export function App() {
           onContentUpdate={onQueryChange}
         />
         <pre>
-          <MaybeResultsTable maybeTable={qResult} />
+          <MaybeTable maybeTable={qResult} />
         </pre>
       </div>
     );
   }
 }
 
-function MaybeResultsTable({ maybeTable }) {
-  if (maybeTable === null) {
+function MaybeTable({ maybeTable }) {
+  if (maybeTable === null || maybeTable === undefined) {
     return <p>No data</p>;
   } else {
-    return <ResultsTable table={maybeTable} />;
+    return <Table table={maybeTable} />;
   }
-}
-
-function ResultsTable({ table }) {
-  const { columns, values } = table;
-  return (
-    <table>
-      <thead>
-        <tr>
-          {columns.map((columnName, i) => (
-            <td key={i}>{columnName}</td>
-          ))}
-        </tr>
-      </thead>
-
-      <tbody>
-        {values.map((row, i) => (
-          <tr key={i}>
-            {row.map((value, i) => (
-              <td key={i}>{value}</td>
-            ))}
-          </tr>
-        ))}
-      </tbody>
-    </table>
-  );
 }
