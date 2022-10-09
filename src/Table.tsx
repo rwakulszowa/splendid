@@ -1,7 +1,7 @@
 // Result table type, as returned from Sql.js.
-type Table = { columns: [string]; values: [[string]] };
+export type TableProps = { columns: [string]; values: [[string]] };
 
-export function Table({ table }: { table: Table }) {
+export function Table({ table }: { table: TableProps }) {
   const { columns, values } = table;
   return (
     <table>

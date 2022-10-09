@@ -685,6 +685,13 @@
     posthtml-render "^3.0.0"
     semver "^5.7.1"
 
+"@parcel/ts-utils@2.7.0":
+  version "2.7.0"
+  resolved "https://registry.yarnpkg.com/@parcel/ts-utils/-/ts-utils-2.7.0.tgz#b5abe7eb5f977c238e11178bbf9a481481d60d1e"
+  integrity sha512-hxgWu9p9+zo9OvllYy12DRrAEyAGGLQysI6PyNvYvsZSmb7sQg9YQ7spD1QmWIQUC1H6BkyzQsowpK0hvPK1xg==
+  dependencies:
+    nullthrows "^1.1.1"
+
 "@parcel/types@2.7.0":
   version "2.7.0"
   resolved "https://registry.yarnpkg.com/@parcel/types/-/types-2.7.0.tgz#c89e95964339324c1931ef7a17906a72291d6b73"
@@ -710,6 +717,17 @@
     "@parcel/markdown-ansi" "2.7.0"
     "@parcel/source-map" "^2.0.0"
     chalk "^4.1.0"
+
+"@parcel/validator-typescript@^2.7.0":
+  version "2.7.0"
+  resolved "https://registry.yarnpkg.com/@parcel/validator-typescript/-/validator-typescript-2.7.0.tgz#d00d7998acbc4fcc866f761f6a987ac69a928fd0"
+  integrity sha512-VZfFRbsCw0jaZVsVjbIFxa1ROVn7Yqq1zGDp30x/pPKC+vyWv0OkVybeCis7lO96Z/ojVB7hILzVi8nj+86JLA==
+  dependencies:
+    "@parcel/diagnostic" "2.7.0"
+    "@parcel/plugin" "2.7.0"
+    "@parcel/ts-utils" "2.7.0"
+    "@parcel/types" "2.7.0"
+    "@parcel/utils" "2.7.0"
 
 "@parcel/watcher@^2.0.0":
   version "2.0.5"
@@ -2216,6 +2234,11 @@ type-fest@^0.20.2:
   version "0.20.2"
   resolved "https://registry.yarnpkg.com/type-fest/-/type-fest-0.20.2.tgz#1bf207f4b28f91583666cb5fbd327887301cd5f4"
   integrity sha512-Ne+eE4r0/iWnpAxD852z3A+N0Bt5RN//NjJwRd2VFHEmrywxf5vsZlh4R6lixl6B+wz/8d+maTSAkN1FIkI3LQ==
+
+typescript@>=3.0.0:
+  version "4.8.4"
+  resolved "https://registry.yarnpkg.com/typescript/-/typescript-4.8.4.tgz#c464abca159669597be5f96b8943500b238e60e6"
+  integrity sha512-QCh+85mCy+h0IGff8r5XWzOVSbBO+KfeYrMQh7NJ58QujwcE22u+NUSmUxqF+un70P9GXKxa2HCNiTTMJknyjQ==
 
 update-browserslist-db@^1.0.9:
   version "1.0.9"

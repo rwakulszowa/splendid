@@ -4,17 +4,16 @@ import initSqlJs from "sql.js";
 import wasmURL from "url:sql.js/dist/sql-wasm.wasm";
 
 import { Editor } from "./Editor";
-import { Table } from "./Table";
+import { Table, TableProps } from "./Table";
 
-type DbResult = string | SQL.Database;
-type Table = { columns: [string]; values: [string] };
+type DbResult = string | any;
 
 export function App() {
   // State of the DB.
   const [dbState, setDbState] = useState<DbResult>("Loading");
 
   // Most recent query result.
-  const [qResult, setQResult] = useState<Table | null>(null);
+  const [qResult, setQResult] = useState<TableProps | null>(null);
 
   useEffect(() => {
     async function connectDb() {
@@ -65,7 +64,11 @@ export function App() {
   }
 }
 
-function MaybeTable({ maybeTable }) {
+function MaybeTable({
+  maybeTable,
+}: {
+  maybeTable: TableProps | null | undefined;
+}) {
   if (maybeTable === null || maybeTable === undefined) {
     return <p>No data</p>;
   } else {

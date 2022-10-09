@@ -1,13 +1,13 @@
 import { useState, useEffect } from "react";
 
-export function Editor({ initialContent, onContentUpdate }) {
+export function Editor({
+  initialContent,
+  onContentUpdate,
+}: {
+  initialContent: string;
+  onContentUpdate: (content: string) => void;
+}) {
   const [content, setContent] = useState<string>(initialContent);
-
-  const onChange = (event) => {
-    const content = event.target.value;
-    setContent(content);
-    onContentUpdate(content);
-  };
 
   // Invoke the event emitter right away, to inform the caller
   // about an initial result.
@@ -18,7 +18,14 @@ export function Editor({ initialContent, onContentUpdate }) {
   return (
     <label>
       Query
-      <textarea value={content} onChange={onChange} />
+      <textarea
+        value={content}
+        onChange={(event) => {
+          const content = event.target.value;
+          setContent(content);
+          onContentUpdate(content);
+        }}
+      />
     </label>
   );
 }
