@@ -51,10 +51,10 @@ export function App() {
     };
 
     return (
-      <div className="flex flex-row gap-4 p-4 h-screen">
+      <div className="grid grid-cols-2 grid-rows-2 gap-4 p-4 h-screen w-full">
         <div
           id="editor-container"
-          className="basis-1/2 w-full h-3/4 flex flex-col"
+          className="col-span-1 row-span-2 w-full h-3/4 flex flex-col"
         >
           <label htmlFor="editor" className="font-light">
             Query Editor
@@ -68,7 +68,7 @@ export function App() {
         </div>
         <div
           id="result-container"
-          className="basis-1/2 w-full h-full flex flex-col"
+          className="col-span-1 row-span-2 w-full h-full flex flex-col"
         >
           <label htmlFor="result" className="font-light">
             Result
