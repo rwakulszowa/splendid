@@ -4,6 +4,7 @@
     "target": "es2021",
     "strict": true,
     "moduleResolution": "nodenext",
-    "jsx": "preserve"
+    "jsx": "preserve",
+    "allowSyntheticDefaultImports": true
   }
 }
