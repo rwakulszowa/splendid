@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 export function Editor({ initialContent, onContentUpdate }) {
   const [content, setContent] = useState<string>(initialContent);
@@ -8,6 +8,12 @@ export function Editor({ initialContent, onContentUpdate }) {
     setContent(content);
     onContentUpdate(content);
   };
+
+  // Invoke the event emitter right away, to inform the caller
+  // about an initial result.
+  useEffect(() => {
+    onContentUpdate(initialContent);
+  }, []);
 
   return (
     <label>
