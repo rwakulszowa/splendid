@@ -5,6 +5,7 @@ import wasmURL from "url:sql.js/dist/sql-wasm.wasm";
 
 import { Editor } from "./Editor";
 import { Table, TableProps } from "./Table";
+import { Viz } from "./Viz";
 
 type DbResult = string | any;
 
@@ -68,15 +69,26 @@ export function App() {
         </div>
         <div
           id="result-container"
-          className="col-span-1 row-span-2 w-full h-full flex flex-col"
+          className="col-span-1 col-start-2 row-span-1 w-full h-full flex flex-col"
         >
-          <label htmlFor="result" className="font-light">
+          <label htmlFor="query-result" className="font-light">
             Result
           </label>
           <div id="query-result" className="grow">
             <pre>
               <MaybeTable maybeTable={qResult} />
             </pre>
+          </div>
+        </div>
+        <div
+          id="viz-container"
+          className="col-span-1 col-start-2 row-span-1 row-start-2 w-full h-full flex flex-col"
+        >
+          <label htmlFor="query-viz" className="font-light">
+            Result Visualization
+          </label>
+          <div id="query-viz" className="grow">
+            <Viz />
           </div>
         </div>
       </div>
