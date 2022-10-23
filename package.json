@@ -12,6 +12,8 @@
   "author": "rwa <rwakulszowa1@gmail.com>",
   "license": "MIT",
   "devDependencies": {
+    "@parcel/transformer-js": "^2.7.0",
+    "@parcel/transformer-react-refresh-wrap": "^2.7.0",
     "@parcel/validator-typescript": "^2.7.0",
     "@types/jest": "^29.2.0",
     "@types/lodash": "^4.14.186",
