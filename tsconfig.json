@@ -5,6 +5,8 @@
     "strict": true,
     "moduleResolution": "nodenext",
     "jsx": "preserve",
-    "allowSyntheticDefaultImports": true
+    "allowSyntheticDefaultImports": true,
+    "skipLibCheck": true,
+    "noEmit": true
   }
 }
