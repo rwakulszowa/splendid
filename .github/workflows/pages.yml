@@ -36,8 +36,14 @@ jobs:
         with:
           node-version: 18
           cache: "pnpm"
+      - name: Check file format
+        uses: creyD/prettier_action@v4.2
+        with:
+          dry: "true"
       - name: Install dependencies
         run: pnpm install
+      - name: Static analysis
+        run: pnpm tsc
       - name: Run unit tests
         run: pnpm test
       - name: Build the app
