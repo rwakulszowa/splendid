@@ -3,11 +3,12 @@ import { useState, useEffect } from "react";
 import initSqlJs from "sql.js";
 import wasmURL from "url:sql.js/dist/sql-wasm.wasm";
 
+import { Db, DbBuildError } from "./lib/Db";
 import { Editor } from "./Editor";
 import { Table, TableProps } from "./Table";
 import { Viz } from "./Viz";
 
-type DbResult = string | any;
+type DbResult = Db | string;
 
 export function App() {
   // State of the DB.
@@ -18,25 +19,20 @@ export function App() {
 
   useEffect(() => {
     async function connectDb() {
-      try {
-        const SQL = await initSqlJs({ locateFile: () => wasmURL });
-        const db = new SQL.Database();
-
-        // Insert some initial data.
-        db.run(`
-          CREATE TABLE pets (name string, size int);
-          INSERT INTO pets VALUES ("Azor", 15), ("Bonifacy", 5);
-        `);
-
+      const dbResult = await Db.build();
+      if (dbResult instanceof Db) {
+        const db = dbResult;
+        db.exec("CREATE TABLE pets (name string, size int);");
+        db.exec(`INSERT INTO pets VALUES ("Azor", 15), ("Bonifacy", 5);`);
         setDbState(db);
-      } catch (err) {
-        setDbState(err);
+      } else {
+        setDbState(dbResult.toString());
       }
     }
     connectDb();
   }, []);
 
-  if (typeof dbState === "string") {
+  if (!(dbState instanceof Db)) {
     const error = dbState;
     return <pre>{error.toString()}</pre>;
   } else {
@@ -44,7 +40,7 @@ export function App() {
 
     const onQueryChange = (query: string) => {
       try {
-        const result = db.exec(query)[0];
+        const result = db.exec(query);
         setQResult(result);
       } catch (e) {
         console.error(e);
