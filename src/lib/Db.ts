@@ -24,13 +24,13 @@ export class DbBuildError {
 export class Db {
   constructor(private readonly db: SqlDb) {}
 
-  static async build(): Db | DbBuildError {
+  static async build(): Promise<Db | DbBuildError> {
     try {
       const SQL = await initSqlJs({ locateFile: () => wasmURL });
       const db = new SQL.Database();
       return new Db(db);
     } catch (err) {
-      return new DbBuildError(err);
+      return new DbBuildError(`${err}`);
     }
   }
 
