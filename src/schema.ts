@@ -43,9 +43,14 @@ export function guess(input: unknown[]): Schema[] {
 		case "object":
 			throw new Error("Objects are not yet supported.");
 		case "array": {
-			const itemType = guess(input.flat());
-			// TODO: handle tuples as well.
-			return [new ContainerSchema(itemType)];
+			// Sequence.
+			const item = guess(input.flat());
+			const containerSchema = new ContainerSchema(item);
+
+			// Tuple.
+			const items = transpose(input as unknown[][]).map(guess);
+			const tupleSchema = new ProductSchema(items);
+			return [containerSchema, tupleSchema];
 		}
 	}
 }
@@ -66,4 +71,22 @@ function jsType(x: unknown): JsType {
 		return "object";
 	}
 	throw new Error(`Cannot infer JS type. x=${x}`);
+}
+
+function transpose<T>(xs: T[][]): T[][] {
+	if (xs.length === 0) {
+		return [];
+	}
+	const rows = xs.length;
+	const cols = Math.max(...xs.map((x) => x.length));
+	const ret: T[][] = new Array(cols)
+		.fill(null)
+		.map(() => new Array(rows).fill(null));
+	for (let iRow = 0; iRow < rows; iRow++) {
+		for (let iCol = 0; iCol < cols; iCol++) {
+			// biome-ignore lint/style/noNonNullAssertion: safe
+			ret[iCol]![iRow] = xs[iRow]![iCol]!;
+		}
+	}
+	return ret;
 }
