@@ -10,7 +10,6 @@ class ContainerSchema extends Schema {
 	}
 }
 
-// @ts-ignore
 class ProductSchema extends Schema {
 	constructor(public readonly items: Schema[]) {
 		super();
@@ -29,6 +28,9 @@ export function guess(input: unknown[]): Schema[] {
 		throw new Error("Cannot guess from an empty input.");
 	}
 	const jsTypes = new Set(input.map(jsType));
+	// Let's ignore nulls for now.
+	jsTypes.delete("null");
+
 	if (jsTypes.size !== 1) {
 		// FIXME: handle by grouping and adding a SumSchema.
 		throw new Error(`Non uniform types found. types=${jsTypes}`);
@@ -52,10 +54,12 @@ export function guess(input: unknown[]): Schema[] {
 			const tupleSchema = new ProductSchema(items);
 			return [containerSchema, tupleSchema];
 		}
+		case "null":
+			throw new Error("Cannot infer from null.");
 	}
 }
 
-type JsType = "number" | "string" | "array" | "object";
+type JsType = "number" | "string" | "array" | "object" | "null";
 
 function jsType(x: unknown): JsType {
 	if (typeof x === "number") {
@@ -70,22 +74,25 @@ function jsType(x: unknown): JsType {
 	if (typeof x === "object" && x !== null) {
 		return "object";
 	}
+	if (x === null) {
+		return "null";
+	}
 	throw new Error(`Cannot infer JS type. x=${x}`);
 }
 
-function transpose<T>(xs: T[][]): T[][] {
+function transpose<T>(xs: T[][]): (T | null)[][] {
 	if (xs.length === 0) {
 		return [];
 	}
 	const rows = xs.length;
 	const cols = Math.max(...xs.map((x) => x.length));
-	const ret: T[][] = new Array(cols)
+	const ret: (T | null)[][] = new Array(cols)
 		.fill(null)
 		.map(() => new Array(rows).fill(null));
 	for (let iRow = 0; iRow < rows; iRow++) {
 		for (let iCol = 0; iCol < cols; iCol++) {
 			// biome-ignore lint/style/noNonNullAssertion: safe
-			ret[iCol]![iRow] = xs[iRow]![iCol]!;
+			ret[iCol]![iRow] = xs[iRow]![iCol] || null;
 		}
 	}
 	return ret;
