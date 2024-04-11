@@ -1,7 +1,7 @@
 import { guess } from "./src/schema.ts";
 
 const data = [
-	[1, 2],
-	[3, 4, 5],
+	{ x: [1, 2], y: [3] },
+	{ a: [1, 2, 3], b: [] },
 ];
 console.log(data, guess(data));

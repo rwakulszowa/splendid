@@ -24,35 +24,53 @@ class SumSchema extends Schema {
 }
 
 export function guess(input: unknown[]): Schema[] {
-	if (input.length === 0) {
-		throw new Error("Cannot guess from an empty input.");
-	}
 	const jsTypes = new Set(input.map(jsType));
 	// Let's ignore nulls for now.
 	jsTypes.delete("null");
 
-	if (jsTypes.size !== 1) {
+	if (jsTypes.size === 0) {
+		throw new Error("Cannot guess from an empty input.");
+	}
+	if (jsTypes.size > 1) {
 		// FIXME: handle by grouping and adding a SumSchema.
 		throw new Error(`Non uniform types found. types=${jsTypes}`);
 	}
-
 	const jsType_: JsType = jsTypes.values().next().value;
+
 	switch (jsType_) {
 		case "number":
 			return [new NumberSchema()];
 		case "string":
 			return [new TextSchema()];
-		case "object":
-			throw new Error("Objects are not yet supported.");
+		case "object": {
+			// Map.
+			const items = guess(input.flatMap((x) => Object.values(x as object)));
+			const containerSchemas = items.map((item) => new ContainerSchema(item));
+
+			// Object.
+			const productItems = transpose(
+				transpose(input.map((x) => Object.values(x as object))).map(guess),
+			) as Schema[][];
+			const productSchemas = productItems.map(
+				(items) => new ProductSchema(items),
+			);
+
+			return ([] as Schema[]).concat(containerSchemas, productSchemas);
+		}
 		case "array": {
 			// Sequence.
-			const item = guess(input.flat());
-			const containerSchema = new ContainerSchema(item);
+			const containerItems = guess(input.flat());
+			const containerSchemas = containerItems.map(
+				(item) => new ContainerSchema(item),
+			);
 
 			// Tuple.
-			const items = transpose(input as unknown[][]).map(guess);
-			const tupleSchema = new ProductSchema(items);
-			return [containerSchema, tupleSchema];
+			const tupleItems = transpose(
+				transpose(input as unknown[][]).map(guess),
+			) as Schema[][];
+			const tupleSchemas = tupleItems.map((items) => new ProductSchema(items));
+
+			return ([] as Schema[]).concat(containerSchemas, tupleSchemas);
 		}
 		case "null":
 			throw new Error("Cannot infer from null.");
