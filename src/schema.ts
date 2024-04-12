@@ -1,12 +1,24 @@
 abstract class Schema {}
 
-class NumberSchema extends Schema {}
+class NumberSchema extends Schema {
+	override toString(): string {
+		return "Number";
+	}
+}
 
-class TextSchema extends Schema {}
+class TextSchema extends Schema {
+	override toString(): string {
+		return "Text";
+	}
+}
 
 class ContainerSchema extends Schema {
 	constructor(public readonly item: Schema) {
 		super();
+	}
+
+	override toString(): string {
+		return `{[key]: ${this.item.toString()}}`;
 	}
 }
 
@@ -14,12 +26,20 @@ class ProductSchema extends Schema {
 	constructor(public readonly items: Schema[]) {
 		super();
 	}
+
+	override toString(): string {
+		return `{${this.items.map((x) => x.toString()).join(" * ")}}`;
+	}
 }
 
 // @ts-ignore
 class SumSchema extends Schema {
 	constructor(public readonly options: Schema[]) {
 		super();
+	}
+
+	override toString(): string {
+		return `{${this.options.map((x) => x.toString()).join(" + ")}}`;
 	}
 }
 

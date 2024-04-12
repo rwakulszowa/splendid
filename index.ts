@@ -10,7 +10,7 @@ async function main() {
 		throw new Error("Input must be an array.");
 	}
 	for (const schema of guess(input)) {
-		console.log(schema);
+		console.log(schema.toString());
 	}
 }
 
