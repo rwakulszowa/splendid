@@ -1,7 +1,17 @@
 import { guess } from "./src/schema.ts";
 
-const data = [
-	{ x: [1, 2], y: [3] },
-	{ a: [1, 2, 3], b: [] },
-];
-console.log(data, guess(data));
+async function readStdIn(): Promise<unknown> {
+	return await Bun.stdin.json();
+}
+
+async function main() {
+	const input = await readStdIn();
+	if (!Array.isArray(input)) {
+		throw new Error("Input must be an array.");
+	}
+	for (const schema of guess(input)) {
+		console.log(schema);
+	}
+}
+
+await main();
