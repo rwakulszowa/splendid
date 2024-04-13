@@ -13,22 +13,29 @@ class TextSchema extends Schema {
 }
 
 class ContainerSchema extends Schema {
-	constructor(public readonly item: Schema) {
+	constructor(
+		public readonly key: NumberSchema | TextSchema,
+		public readonly value: Schema,
+	) {
 		super();
 	}
 
 	override toString(): string {
-		return `{[key]: ${this.item.toString()}}`;
+		return `{[${this.key.toString()}]: ${this.value.toString()}}`;
 	}
 }
 
 class ProductSchema extends Schema {
-	constructor(public readonly items: Schema[]) {
+	constructor(
+		public readonly items: { key: number | string; value: Schema }[],
+	) {
 		super();
 	}
 
 	override toString(): string {
-		return `{${this.items.map((x) => x.toString()).join(" * ")}}`;
+		return `{${this.items
+			.map(({ key, value }) => `${key}: ${value.toString()}`)
+			.join(" * ")}}`;
 	}
 }
 
@@ -65,14 +72,23 @@ export function guess(input: unknown[]): Schema[] {
 		case "object": {
 			// Map.
 			const items = guess(input.flatMap((x) => Object.values(x as object)));
-			const containerSchemas = items.map((item) => new ContainerSchema(item));
+			const containerSchemas = items.map(
+				(item) => new ContainerSchema(new TextSchema(), item),
+			);
 
 			// Object.
-			const productItems = transpose(
-				transpose(input.map((x) => Object.values(x as object))).map(guess),
+			const unifiedInput = unifyObjects(input as object[]);
+			// biome-ignore lint/style/noNonNullAssertion: safe
+			const keys = Object.keys(unifiedInput[0]!);
+			const values = unifiedInput.map((x) => Object.values(x));
+			const productValues = transpose(
+				transpose(values).map(guess),
 			) as Schema[][];
-			const productSchemas = productItems.map(
-				(items) => new ProductSchema(items),
+			const productSchemas = productValues.map(
+				(values) =>
+					new ProductSchema(
+						zip(keys, values).map(([key, value]) => ({ key, value })),
+					),
 			);
 
 			return ([] as Schema[]).concat(containerSchemas, productSchemas);
@@ -81,14 +97,19 @@ export function guess(input: unknown[]): Schema[] {
 			// Sequence.
 			const containerItems = guess(input.flat());
 			const containerSchemas = containerItems.map(
-				(item) => new ContainerSchema(item),
+				(item) => new ContainerSchema(new NumberSchema(), item),
 			);
 
 			// Tuple.
 			const tupleItems = transpose(
 				transpose(input as unknown[][]).map(guess),
 			) as Schema[][];
-			const tupleSchemas = tupleItems.map((items) => new ProductSchema(items));
+			const tupleSchemas = tupleItems.map(
+				(items) =>
+					new ProductSchema(
+						items.map((item, index) => ({ key: index, value: item })),
+					),
+			);
 
 			return ([] as Schema[]).concat(containerSchemas, tupleSchemas);
 		}
@@ -134,4 +155,24 @@ function transpose<T>(xs: T[][]): (T | null)[][] {
 		}
 	}
 	return ret;
+}
+
+function zip<T, U>(ts: T[], us: U[]): [T, U][] {
+	if (ts.length !== us.length) {
+		throw new Error("Cannot zip lists of different lengths.");
+	}
+	return ts.map((t, i) => [t, us[i] as U]);
+}
+
+/**
+ * Given a list of objects with potentially different sets of keys,
+ * return a list of the same objects, but all with the same sets of keys.
+ * Missing values are set to `null`.
+ */
+function unifyObjects(xs: object[]): object[] {
+	const emptiedXs = xs.map((x) =>
+		Object.fromEntries(Object.keys(x).map((k) => [k, null])),
+	);
+	const prototype = Object.assign({}, ...emptiedXs);
+	return xs.map((x) => ({ ...prototype, ...x }));
 }
