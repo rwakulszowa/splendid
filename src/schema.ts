@@ -92,15 +92,18 @@ function guessUniformType<T>(type: JsType, input: T[]): Schema[] {
 			const unifiedInput = unifyObjects(input as object[]);
 			const keys = Object.keys(unifiedInput[0] as object);
 			const values = unifiedInput.map((x) => Object.values(x));
-			const productValues = transpose(
-				transpose(values).map(guess),
-			) as Schema[][];
-			const productSchemas = productValues.map(
-				(values) =>
-					new ProductSchema(
-						zip(keys, values).map(([key, value]) => ({ key, value })),
-					),
-			);
+			const productValues = transpose(transpose(values).map(guess));
+			const productSchemas = productValues
+				.filter((values) => values.every((x) => x !== null))
+				.map(
+					(values) =>
+						new ProductSchema(
+							zip(keys, values as Schema[]).map(([key, value]) => ({
+								key,
+								value,
+							})),
+						),
+				);
 
 			return ([] as Schema[]).concat(containerSchemas, productSchemas);
 		}
@@ -112,15 +115,18 @@ function guessUniformType<T>(type: JsType, input: T[]): Schema[] {
 			);
 
 			// Tuple.
-			const tupleItems = transpose(
-				transpose(input as unknown[][]).map(guess),
-			) as Schema[][];
-			const tupleSchemas = tupleItems.map(
-				(items) =>
-					new ProductSchema(
-						items.map((item, index) => ({ key: index, value: item })),
-					),
-			);
+			const tupleItems = transpose(transpose(input as unknown[][]).map(guess));
+			const tupleSchemas = tupleItems
+				.filter((values) => values.every((x) => x !== null))
+				.map(
+					(items) =>
+						new ProductSchema(
+							(items as Schema[]).map((item, index) => ({
+								key: index,
+								value: item,
+							})),
+						),
+				);
 
 			return ([] as Schema[]).concat(containerSchemas, tupleSchemas);
 		}
