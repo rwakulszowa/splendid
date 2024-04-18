@@ -67,8 +67,7 @@ export function guess(input: unknown[]): Schema[] {
 
 	// One group found - return directly.
 	if (guessedPerGroup.length === 1) {
-		// biome-ignore lint/style/noNonNullAssertion: safe
-		const head = guessedPerGroup[0]!;
+		const head = guessedPerGroup[0] as Schema[];
 		return head;
 	}
 
@@ -91,8 +90,7 @@ function guessUniformType<T>(type: JsType, input: T[]): Schema[] {
 
 			// Object.
 			const unifiedInput = unifyObjects(input as object[]);
-			// biome-ignore lint/style/noNonNullAssertion: safe
-			const keys = Object.keys(unifiedInput[0]!);
+			const keys = Object.keys(unifiedInput[0] as object);
 			const values = unifiedInput.map((x) => Object.values(x));
 			const productValues = transpose(
 				transpose(values).map(guess),
