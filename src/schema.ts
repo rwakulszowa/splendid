@@ -39,7 +39,6 @@ class ProductSchema extends Schema {
 	}
 }
 
-// @ts-ignore
 class SumSchema extends Schema {
 	constructor(public readonly options: Schema[]) {
 		super();
@@ -51,20 +50,34 @@ class SumSchema extends Schema {
 }
 
 export function guess(input: unknown[]): Schema[] {
-	const jsTypes = new Set(input.map(jsType));
-	// Let's ignore nulls for now.
-	jsTypes.delete("null");
+	const groupedByType = groupBy(input, jsType);
 
-	if (jsTypes.size === 0) {
+	// Let's ignore nulls for now.
+	groupedByType.delete("null");
+
+	if (groupedByType.size === 0) {
 		throw new Error("Cannot guess from an empty input.");
 	}
-	if (jsTypes.size > 1) {
-		// FIXME: handle by grouping and adding a SumSchema.
-		throw new Error(`Non uniform types found. types=${jsTypes}`);
-	}
-	const jsType_: JsType = jsTypes.values().next().value;
 
-	switch (jsType_) {
+	const guessedPerGroup: Schema[][] = [];
+	for (const [type, inputGroup] of groupedByType.entries()) {
+		const guessed = guessUniformType(type, inputGroup);
+		guessedPerGroup.push(guessed);
+	}
+
+	// One group found - return directly.
+	if (guessedPerGroup.length === 1) {
+		// biome-ignore lint/style/noNonNullAssertion: safe
+		const head = guessedPerGroup[0]!;
+		return head;
+	}
+
+	// Multiple groups - combine into Sums.
+	return cartesian(guessedPerGroup).map((options) => new SumSchema(options));
+}
+
+function guessUniformType<T>(type: JsType, input: T[]): Schema[] {
+	switch (type) {
 		case "number":
 			return [new NumberSchema()];
 		case "string":
@@ -175,4 +188,27 @@ function unifyObjects(xs: object[]): object[] {
 	);
 	const prototype = Object.assign({}, ...emptiedXs);
 	return xs.map((x) => ({ ...prototype, ...x }));
+}
+
+function groupBy<K, V>(xs: V[], key: (v: V) => K): Map<K, V[]> {
+	const ret: Map<K, V[]> = new Map();
+	for (const x of xs) {
+		const k = key(x);
+		const row = ret.get(k);
+		if (row) {
+			row.push(x);
+		} else {
+			ret.set(k, [x]);
+		}
+	}
+	return ret;
+}
+
+// Based on https://stackoverflow.com/a/43053803.
+// Added a fix for singleton arguments.
+function cartesian<A>(rows: Array<Array<A>>): Array<Array<A>> {
+	return rows.reduce(
+		(acc: A[][], xs: A[]) => acc.flatMap((a) => xs.map((x) => [...a, x])),
+		[[]],
+	);
 }
