@@ -6,9 +6,15 @@ class NumberSchema extends Schema {
 	}
 }
 
+type TextFormat = "date" | "number" | "json" | null;
+
 class TextSchema extends Schema {
+	constructor(public readonly format: TextFormat | null) {
+		super();
+	}
+
 	override toString(): string {
-		return "Text";
+		return `Text(${this.format || "_"})`;
 	}
 }
 
@@ -80,12 +86,15 @@ function guessUniformType<T>(type: JsType, input: T[]): Schema[] {
 		case "number":
 			return [new NumberSchema()];
 		case "string":
-			return [new TextSchema()];
+			return [new TextSchema(guessTextFormat(input as string[]))];
 		case "object": {
 			// Map.
+			const mapKeyFormat = guessTextFormat(
+				input.flatMap((x) => Object.keys(x as object)),
+			);
 			const items = guess(input.flatMap((x) => Object.values(x as object)));
 			const containerSchemas = items.map(
-				(item) => new ContainerSchema(new TextSchema(), item),
+				(item) => new ContainerSchema(new TextSchema(mapKeyFormat), item),
 			);
 
 			// Object.
@@ -133,6 +142,46 @@ function guessUniformType<T>(type: JsType, input: T[]): Schema[] {
 		case "null":
 			throw new Error("Cannot infer from null.");
 	}
+}
+
+/**
+ * If all `xs` follow the same pattern (e.g. `YYYY:MM:DD`), detect the format to allow parsing.
+ * This function only detects very simple patterns, by design.
+ * It does not replace a proper top level parser.
+ *
+ * TODO:
+ *  - add more well known formats
+ *  - fall back to grouping by position (detect constants at every position, group remaining parts into sections)
+ *  - fall back to grouping by separators (detect common separators, group remaining parts into sections)
+ *  - detect common encodings (e.g. base64)
+ */
+function guessTextFormat(xs: string[]): TextFormat {
+	if (xs.length === 0) {
+		return null;
+	}
+	const isDate = (x: string) => new Date(x).toString() !== "Invalid Date";
+	if (xs.every(isDate)) {
+		return "date";
+	}
+	const isNumber = (x: string) => !Number.isNaN(Number.parseFloat(x));
+	if (xs.every(isNumber)) {
+		return "number";
+	}
+	const isJson = (x: string) => {
+		try {
+			JSON.parse(x);
+			return true;
+		} catch (e) {
+			if (e instanceof SyntaxError) {
+				return false;
+			}
+			throw e;
+		}
+	};
+	if (xs.every(isJson)) {
+		return "json";
+	}
+	return null;
 }
 
 type JsType = "number" | "string" | "array" | "object" | "null";
