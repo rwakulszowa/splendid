@@ -1,0 +1,28 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Splendid</title>
+    <script src="./script.js"></script>
+  </head>
+  <body>
+    <form oninput="result.value=handleInput(input.value)">
+      <label>
+        Input data
+        <textarea
+          autocomplete="off"
+          autofocus
+          cols="50"
+          id="input"
+          name="input"
+          rows="10"
+        ></textarea>
+      </label>
+      <label>
+        Result
+        <output for="input" id="result" name="result"></output>
+      </label>
+    </form>
+  </body>
+</html>
